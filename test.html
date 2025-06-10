@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>MindAR 星球介紹</title>
+    <!-- 載入 A-Frame 和 MindAR -->
+    <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.2/dist/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <style>
+      body { margin: 0; overflow: hidden; }
+      #text-box {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        width: 300px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 12px;
+        border-radius: 10px;
+        font-size: 14px;
+        line-height: 1.6;
+        display: none;
+        z-index: 10;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 顯示文字的盒子 -->
+    <div id="text-box"></div>
+
+    <!-- A-Frame 場景設定 -->
+    <a-scene
+      mindar-image="imageTargetSrc: targets1.mind; autoStart: true; uiScanning: true;"
+      color-space="sRGB"
+      renderer="colorManagement: true; physicallyCorrectLights: true"
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: false"
+    >
+      <!-- 載入影片資源 -->
+      <a-assets>
+        <video id="introVid" src="1.mp4" preload="auto" loop muted></video>
+      </a-assets>
+
+      <!-- 環境光 -->
+      <a-light type="ambient" intensity="1.5"></a-light>
+
+      <!-- 相機 -->
+      <a-camera look-controls="enabled: false"></a-camera>
+
+      <!-- 掃描圖卡後顯示的內容 -->
+      <a-entity mindar-image-target="targetIndex: 0">
+        <a-video
+          id="videoEntity"
+          src="#introVid"
+          width="0.7"
+          height="1.2"
+          autoplay="false"
+          loop="true"
+          material="shader: flat"
+          position="0 0 0"
+        ></a-video>
+      </a-entity>
+    </a-scene>
+
+    <!-- 控制播放與顯示文字的邏輯 -->
+    <script>
+      const video = document.querySelector('#introVid');
+      const videoPlane = document.querySelector('#videoEntity');
+      const targetEntity = document.querySelector('a-entity[mindar-image-target]');
+      const textBox = document.querySelector('#text-box');
+
+      // 點擊影片播放 / 暫停
+      videoPlane.addEventListener('click', () => {
+        if (video.paused) {
+          video.play();
+        } else {
+          video.pause();
+        }
+      });
+
+      // 偵測圖卡出現
+      targetEntity.addEventListener('targetFound', () => {
+        video.play();
+        textBox.style.display = 'block';
+        textBox.innerText = `🌍 地球（Earth）：
+地球是目前唯一已知擁有生命的星球，有穩定的氮氧大氣、水資源與氣候。
+表面包含海洋、大陸、冰冠等多樣地形。有一顆天然衛星——月球。
+表面呈藍色與褐綠色混合，白色雲層分佈。`;
+      });
+
+      // 偵測圖卡消失
+      targetEntity.addEventListener('targetLost', () => {
+        video.pause();
+        video.currentTime = 0;
+        textBox.style.display = 'none';
+        textBox.innerText = '';
+      });
+    </script>
+  </body>
+</html>
