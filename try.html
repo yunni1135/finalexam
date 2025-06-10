@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>八大行星 AR 展示</title>
+  <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.2/dist/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar/dist/mindar-image-aframe.prod.js"></script>
+  <script src="./assets/planet-text.js"></script>
+  <style>
+    .overlay {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      color: white;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 10px;
+      max-width: 80%;
+      border-radius: 8px;
+      font-family: sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay" id="planetText">請掃描任一行星卡片開始</div>
+
+  <a-scene mindar-image="imageTargetSrc: ./markers/targets.mind;" embedded color-space="sRGB" renderer="precision: mediump;" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+    
+    <a-assets>
+      <!-- 載入所有影片資源 -->
+      <video id="vid1" src="./assets/1.mp4" loop="true" crossorigin="anonymous" preload="auto"></video>
+      <video id="vid2" src="./assets/2.mp4" loop="true" crossorigin="anonymous" preload="auto"></video>
+      <video id="vid3" src="./assets/3.mp4" loop="true" crossorigin="anonymous" preload="auto"></video>
+      <video id="vid4" src="./assets/4.mp4" loop="true" crossorigin="anonymous" preload="auto"></video>
+      <video id="vid5" src="./assets/5.mp4" loop="true" crossorigin="anonymous" preload="auto"></video>
+      <video id="vid6" src="./assets/6.mp4" loop="true" crossorigin="anonymous" preload="auto"></video>
+      <video id="vid7" src="./assets/7.mp4" loop="true" crossorigin="anonymous" preload="auto"></video>
+      <video id="vid8" src="./assets/8.mp4" loop="true" crossorigin="anonymous" preload="auto"></video>
+    </a-assets>
+
+    <!-- 建立 8 個 AR marker -->
+    <!-- 範例：土星 -->
+    <a-entity mindar-image-target="targetIndex: 0">
+      <a-video src="#vid1" width="1" height="0.6" position="0 0 0"></a-video>
+    </a-entity>
+    <a-entity mindar-image-target="targetIndex: 1">
+      <a-video src="#vid2" width="1" height="0.6" position="0 0 0"></a-video>
+    </a-entity>
+    <a-entity mindar-image-target="targetIndex: 2">
+      <a-video src="#vid3" width="1" height="0.6" position="0 0 0"></a-video>
+    </a-entity>
+    <a-entity mindar-image-target="targetIndex: 3">
+      <a-video src="#vid4" width="1" height="0.6" position="0 0 0"></a-video>
+    </a-entity>
+    <a-entity mindar-image-target="targetIndex: 4">
+      <a-video src="#vid5" width="1" height="0.6" position="0 0 0"></a-video>
+    </a-entity>
+    <a-entity mindar-image-target="targetIndex: 5">
+      <a-video src="#vid6" width="1" height="0.6" position="0 0 0"></a-video>
+    </a-entity>
+    <a-entity mindar-image-target="targetIndex: 6">
+      <a-video src="#vid7" width="1" height="0.6" position="0 0 0"></a-video>
+    </a-entity>
+    <a-entity mindar-image-target="targetIndex: 7">
+      <a-video src="#vid8" width="1" height="0.6" position="0 0 0"></a-video>
+    </a-entity>
+  </a-scene>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const sceneEl = document.querySelector("a-scene");
+      const textBox = document.getElementById("planetText");
+      const videos = [
+        document.getElementById("vid1"),
+        document.getElementById("vid2"),
+        document.getElementById("vid3"),
+        document.getElementById("vid4"),
+        document.getElementById("vid5"),
+        document.getElementById("vid6"),
+        document.getElementById("vid7"),
+        document.getElementById("vid8"),
+      ];
+
+      const planetTexts = window.planetDescriptions;
+
+      sceneEl.addEventListener("targetFound", (e) => {
+        const targetIndex = e.detail.index;
+        // 停止其他影片
+        videos.forEach((v, i) => {
+          if (i === targetIndex) {
+            v.play();
+          } else {
+            v.pause();
+          }
+        });
+
+        // 顯示對應介紹文字
+        textBox.textContent = planetTexts[targetIndex];
+      });
+
+      sceneEl.addEventListener("targetLost", () => {
+        videos.forEach(v => v.pause());
+        textBox.textContent = "請掃描任一行星卡片開始";
+      });
+    });
+  </script>
+</body>
+</html>
